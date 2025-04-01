@@ -27,13 +27,22 @@ export default function Npc({ npcPos, unlocked, onUnlock, triggerInteraction }) 
     const handleNpcInteraction = () => {
       console.log(npcInteractions)
       setNpcDialog(npcMessages[npcInteractions]);
+
       if (npcInteractions < 2) {
-        // Show next dialog in sequence
         setNpcInteractions((prev) => prev + 1);
       } else {
-        // Unlock after 3 interactions
-        // setNpcDialog(npcMessages[2]);
-        setTimeout(() => onUnlock(), 500); // 🚩 Slight delay for better feedback
+        // 🚩 Show final dialog first
+        setNpcDialog(npcMessages[2]);
+      
+        // 🚩 Then unlock and clear after delay
+        setTimeout(() => {
+          onUnlock();
+      
+          // Let the dialog linger for 2 more seconds
+          setTimeout(() => {
+            setNpcDialog('');
+          }, 2000);
+        }, 2700);
       }
     };
 
@@ -67,20 +76,3 @@ const alertClick = (e) =>{
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
