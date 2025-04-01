@@ -38,6 +38,8 @@ export default function Game() {
   const [npcInteractionTriggered, setNpcInteractionTriggered] = useState(false);
   const [hasKey, setHasKey] = useState(false);
 const [hasHatchet, setHasHatchet] = useState(false);
+const [deadEndTriggered, setDeadEndTriggered] = useState(false);
+
 
 
   // Unlock the tile where NPC was after interaction ---THIS IS GOOD CODE TO REWORK FOR BLOCKED PATH---
@@ -197,6 +199,20 @@ const handleInteraction = () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [npcPos, playerPos]);
+
+  // Tile trigger for the DEAD END message
+useEffect(() => {
+  if (
+    npcUnlocked &&                     // Only after NPC has moved
+    !deadEndTriggered &&               // Only fire once
+    playerPos.x === 10 &&
+    playerPos.y === 16
+  ) {
+    setDeadEndTriggered(true);
+    alert(".....i bet you are feeling pretty silly right about now, you have reached a DEAD END!! hahaha!!");
+  }
+}, [playerPos, npcUnlocked, deadEndTriggered]);
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 space-y-6">
