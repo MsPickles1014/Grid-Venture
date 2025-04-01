@@ -28,7 +28,7 @@ const predefinedGrid = [
 // Main Game Component
 export default function Game() {
   const [grid, setGrid] = useState(predefinedGrid);
-  const [playerPos, setPlayerPos] = useState({ x: 3, y: 16 });
+  const [playerPos, setPlayerPos] = useState({ x: 13, y: 16 });
   const [npcPos, setNpcPos] = useState({ x: 12, y: 16 });
   const [npcUnlocked, setNpcUnlocked] = useState(false);
   const [playerFrame, setPlayerFrame] = useState(0);
@@ -46,9 +46,9 @@ export default function Game() {
   //     });
   //   }
   // }, [npcUnlocked]);
-  useEffect(()=>{
-    console.log("npcpos updated: ", npcPos)
-  },[npcPos])
+  // useEffect(()=>{
+  //   console.log("npcpos updated: ", npcPos)
+  // },[npcPos])
 
   // Prevent out-of-bounds movement
   const getBoundedPosition = (x, y) => ({
@@ -73,11 +73,11 @@ export default function Game() {
 
   // Check if player is next to NPC
   const isNextToNpc = () => {
-    console.log(playerPos)
-    console.log(npcPos)
+    // console.log(playerPos)
+    // console.log(npcPos)
     const dx = Math.abs(playerPos.x - npcPos.x);
     const dy = Math.abs(playerPos.y - npcPos.y);
-    console.log(`dx: ${dx}, dy: ${dy}` )
+    // console.log(`dx: ${dx}, dy: ${dy}` )
     return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
   };
 
@@ -110,7 +110,7 @@ export default function Game() {
 
   // Handle NPC interaction (press 'E')
   const handleInteraction = () => {
-    console.log("isNextToNpc: ", isNextToNpc())
+    // console.log("isNextToNpc: ", isNextToNpc())
     if (isNextToNpc() && !npcInteractionTriggered) {
       setNpcInteractionTriggered(true);
       setTimeout(() => {

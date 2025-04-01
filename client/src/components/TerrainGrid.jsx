@@ -59,7 +59,7 @@ export default function TerrainGrid({
                   const newNpcPos = { x: 12, y: 17 };
                   if (isWithinBounds(newNpcPos.x, newNpcPos.y, grid)) {
                     setNpcUnlocked(true); // Unlock NPC after 3 interactions
-                    console.log("new npc pos: ", newNpcPos )
+                    // console.log("new npc pos: ", newNpcPos )
                     setNpcPos(newNpcPos); // Move NPC to new position
                   } else {
                     console.error('🚨 New NPC position is out of bounds!');
