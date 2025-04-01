@@ -9,6 +9,9 @@ const terrainClasses = {
   rock: 'bg-gray-500', // Obstacle tile (potentially requiring tools)
   path: 'bg-yellow-800', // Walkable path
   cave: 'bg-gray-300', // Walkable cave floor
+  log: 'bg-orange-900',      // Log obstacle (requires hatchet)
+  key: 'bg-blue-300',        // Key pickup tile
+  lockedChest: 'bg-yellow-500', // Locked chest tile
 };
 
 // Function to check if position is within bounds
