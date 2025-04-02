@@ -12,7 +12,7 @@ export default function Npc({ npcPos, unlocked, onUnlock, triggerInteraction }) 
   const [npcInteractions, setNpcInteractions] = useState(0);
   const [npcDialog, setNpcDialog] = useState('');
 
-  // 🚩 Moved outside to avoid re-creation on every render
+  // Moved outside to avoid re-creation on every render
   const npcMessages = [
     "YOU SHALL NOT PASS!!",
     "I'm thuper therial, you don’t want to go down thith way….",
@@ -21,7 +21,7 @@ export default function Npc({ npcPos, unlocked, onUnlock, triggerInteraction }) 
 
   // Handle NPC interaction when triggered by 'E' key
   useEffect(() => {
-    // 🚩 Prevent firing if no interaction triggered
+    // Prevent firing if no interaction triggered
     if (!triggerInteraction || unlocked) return;
 
     const handleNpcInteraction = () => {
@@ -31,10 +31,10 @@ export default function Npc({ npcPos, unlocked, onUnlock, triggerInteraction }) 
       if (npcInteractions < 2) {
         setNpcInteractions((prev) => prev + 1);
       } else {
-        // 🚩 Show final dialog first
+        // Show final dialog first
         setNpcDialog(npcMessages[2]);
       
-        // 🚩 Then unlock and clear after delay
+        // Then unlock and clear after delay
         setTimeout(() => {
           onUnlock();
       
@@ -47,7 +47,7 @@ export default function Npc({ npcPos, unlocked, onUnlock, triggerInteraction }) 
     };
 
     handleNpcInteraction();
-  }, [triggerInteraction, unlocked]); // ✅ Clean dependency array
+  }, [triggerInteraction, unlocked]); // Clean dependency array
 
 
 const alertClick = (e) =>{

@@ -43,24 +43,7 @@ export default function Game() {
 const [hasHatchet, setHasHatchet] = useState(false);
 const [deadEndTriggered, setDeadEndTriggered] = useState(false);
 const [hasPickaxe, setHasPickaxe] = useState(false);
-
-
-
-
-  // Unlock the tile where NPC was after interaction ---THIS IS GOOD CODE TO REWORK FOR BLOCKED PATH---
-  // useEffect(() => {
-  //   if (npcUnlocked) {
-  //     setGrid((prevGrid) => {
-  //       const newGrid = prevGrid.map((row) => [...row]);
-  //       console.log( newGrid[16][12])
-  //       newGrid[16][12] = 'path'; // Unlock NPC path
-  //       return newGrid;
-  //     });
-  //   }
-  // }, [npcUnlocked]);
-  // useEffect(()=>{
-  //   console.log("npcpos updated: ", npcPos)
-  // },[npcPos])
+const [exploredTiles, setExploredTiles] = useState(new Set());
 
   // Prevent out-of-bounds movement
   const getBoundedPosition = (x, y) => ({
@@ -106,12 +89,29 @@ const [hasPickaxe, setHasPickaxe] = useState(false);
       if (isWalkable(newX, newY, npc)) {
         setPlayerDirection(getDirection(dx, dy));
         animatePlayer();
+  
+        // 👁️ Visibility radius logic
+        const currentTile = grid[newY][newX];
+        const radius = currentTile === 'cave' ? 1 : 2;
+  
+        const newExplored = new Set(exploredTiles);
+        for (let dx = -radius; dx <= radius; dx++) {
+          for (let dy = -radius; dy <= radius; dy++) {
+            const ex = newX + dx;
+            const ey = newY + dy;
+            if (ex >= 0 && ex < grid[0].length && ey >= 0 && ey < grid.length) {
+              newExplored.add(`${ex},${ey}`);
+            }
+          }
+        }
+        setExploredTiles(newExplored);
+  
         return { x: newX, y: newY };
       }
       return prev;
     });
   };
-
+  
   // Determine direction for animation
   const getDirection = (dx, dy) => {
     if (dx === -1) return 'left';
@@ -177,19 +177,6 @@ else if (isNextTo(11, 9) && hasPickaxe) {
   alert("You cleared the rockslide with your pickaxe!");
 }
 };
-
-  // // Handle NPC interaction (press 'E')
-  // const handleInteraction = () => {
-  //   // console.log("isNextToNpc: ", isNextToNpc())
-  //   if (isNextToNpc() && !npcInteractionTriggered) {
-  //     setNpcInteractionTriggered(true);
-  //     setTimeout(() => {
-  //       setNpcInteractionTriggered(false);
-  //     }, 200);
-  //   }
-  // };
-  
-
   // Handle keyboard inputs
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -235,15 +222,16 @@ useEffect(() => {
 
 const handleReset = () => {
   setGrid(predefinedGrid.map((row) => [...row])); // deep clone
-  setPlayerPos({ x: 3, y: 16 });
-  setNpcPos({ x: 12, y: 16 });
+  setPlayerPos({ x: 3, y: 16 }); // start position
+  setNpcPos({ x: 12, y: 16 });   // NPC reset
   setNpcUnlocked(false);
   setNpcInteractionTriggered(false);
   setHasKey(false);
   setHasHatchet(false);
   setHasPickaxe(false);
+  setDeadEndTriggered(false);
+  setExploredTiles(new Set()); // CLEAR explored tiles
 };
-
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 space-y-6">
@@ -267,6 +255,7 @@ const handleReset = () => {
         npcInteractionTriggered={npcInteractionTriggered}
         setNpcUnlocked={setNpcUnlocked}
         setNpcPos={setNpcPos}
+        exploredTiles={exploredTiles}
       />
     </div>
   );
