@@ -12,6 +12,9 @@ const terrainClasses = {
   log: 'bg-orange-900',      // Log obstacle (requires hatchet)
   key: 'bg-blue-300',        // Key pickup tile
   lockedChest: 'bg-yellow-500', // Locked chest tile
+  rockslide: 'bg-gray-800',
+pickaxe: 'bg-red-400',
+
 };
 
 // Function to check if position is within bounds
