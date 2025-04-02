@@ -14,6 +14,8 @@ const terrainClasses = {
   lockedChest: 'bg-yellow-500',
   rockslide: 'bg-gray-800',
   pickaxe: 'bg-red-400',
+  secret: 'bg-green-700', 
+
 };
 
 // Function to check if position is within bounds

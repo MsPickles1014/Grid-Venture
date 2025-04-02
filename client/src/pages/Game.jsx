@@ -4,8 +4,8 @@ import TerrainGrid from '../components/TerrainGrid';
 
 const predefinedGrid = [
   ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock'],
-  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'path', 'path', 'path', 'cave', 'cave', 'cave', 'cave', 'rock'],
-  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
+  ['tree', 'tree', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'tree', 'path', 'path', 'path', 'path', 'cave', 'cave', 'cave', 'cave', 'rock'],
+  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'secret', 'tree', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
   ['tree', 'tree', 'tree', 'tree', 'path', 'path', 'path', 'path', 'path', 'path', 'path', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
   ['tree', 'tree', 'tree', 'tree', 'log', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
   ['tree', 'tree', 'path', 'path', 'path', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
@@ -18,16 +18,17 @@ const predefinedGrid = [
   ['tree', 'tree', 'path', 'rock', 'cave', 'cave', 'rock', 'rock', 'cave', 'rock', 'rock', 'rock', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree'],
   ['tree', 'tree', 'path', 'rock', 'rock', 'cave', 'cave', 'cave', 'cave', 'cave', 'cave', 'rock', 'tree', 'path', 'path', 'path', 'path', 'tree', 'path', 'tree'],
   ['tree', 'tree', 'path', 'path', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'tree', 'path', 'tree', 'tree', 'path', 'tree', 'path', 'tree'],
-  ['tree', 'tree', 'tree', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'path', 'tree', 'path', 'tree'],
-  ['tree', 'tree', 'tree', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'path', 'path', 'path', 'path', 'tree', 'tree', 'path', 'tree', 'path', 'tree'],
-  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'path', 'path', 'path', 'tree'],
-  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree'],
+  ['tree', 'tree', 'tree', 'path', 'secret', 'secret', 'secret', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'path', 'tree', 'path', 'tree'],
+  ['tree', 'tree', 'tree', 'path', 'tree', 'tree', 'secret', 'tree', 'tree', 'path', 'path', 'path', 'path', 'path', 'tree', 'tree', 'path', 'tree', 'path', 'tree'],
+  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'secret', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'path', 'path', 'path', 'tree'],
+  ['tree', 'tree', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree'],
   ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree'],
 ];
 // Manually place locked chest
 predefinedGrid[13][10] = 'lockedChest';
 predefinedGrid[9][11] = 'rockslide';   // y: 9, x: 11
 predefinedGrid[7][18] = 'pickaxe';     // y: 7, x: 18
+// s
 
 
 // Main Game Component
@@ -44,6 +45,13 @@ const [hasHatchet, setHasHatchet] = useState(false);
 const [deadEndTriggered, setDeadEndTriggered] = useState(false);
 const [hasPickaxe, setHasPickaxe] = useState(false);
 const [exploredTiles, setExploredTiles] = useState(new Set());
+const [inventoryOpen, setInventoryOpen] = useState(false);
+const [obstacleDialog, setObstacleDialog] = useState('');
+const [systemDialog, setSystemDialog] = useState('');
+const [explorerPoints, setExplorerPoints] = useState(0);
+
+
+
 
   // Prevent out-of-bounds movement
   const getBoundedPosition = (x, y) => ({
@@ -66,7 +74,8 @@ const [exploredTiles, setExploredTiles] = useState(new Set());
     return grid[y][x] === 'path' || 
           grid[y][x] === 'cave' || 
           grid[y][x] === 'key' ||
-          grid[y][x] === 'pickaxe'
+          grid[y][x] === 'pickaxe' ||
+          grid[y][x] === 'secret'
   };
 
   // Check if player is next to NPC
@@ -93,18 +102,46 @@ const [exploredTiles, setExploredTiles] = useState(new Set());
         // 👁️ Visibility radius logic
         const currentTile = grid[newY][newX];
         const radius = currentTile === 'cave' ? 1 : 2;
-  
+
         const newExplored = new Set(exploredTiles);
-        for (let dx = -radius; dx <= radius; dx++) {
-          for (let dy = -radius; dy <= radius; dy++) {
-            const ex = newX + dx;
-            const ey = newY + dy;
-            if (ex >= 0 && ex < grid[0].length && ey >= 0 && ey < grid.length) {
-              newExplored.add(`${ex},${ey}`);
-            }
-          }
-        }
-        setExploredTiles(newExplored);
+let newPoints = 0;
+
+for (let dx = -radius; dx <= radius; dx++) {
+  for (let dy = -radius; dy <= radius; dy++) {
+    const ex = newX + dx;
+    const ey = newY + dy;
+    const key = `${ex},${ey}`;
+    if (
+      ex >= 0 &&
+      ex < grid[0].length &&
+      ey >= 0 &&
+      ey < grid.length &&
+      !newExplored.has(key)
+    ) {
+      newExplored.add(key);
+      newPoints += 1; // Award 1 point per new tile
+    }
+  }
+}
+
+setExploredTiles(newExplored);
+setExplorerPoints((prev) => prev + newPoints);
+
+
+
+
+
+        // const newExplored = new Set(exploredTiles);
+        // for (let dx = -radius; dx <= radius; dx++) {
+        //   for (let dy = -radius; dy <= radius; dy++) {
+        //     const ex = newX + dx;
+        //     const ey = newY + dy;
+        //     if (ex >= 0 && ex < grid[0].length && ey >= 0 && ey < grid.length) {
+        //       newExplored.add(`${ex},${ey}`);
+        //     }
+        //   }
+        // }
+        // setExploredTiles(newExplored);
   
         return { x: newX, y: newY };
       }
@@ -146,7 +183,9 @@ const handleInteraction = () => {
   else if (playerPos.x === 9 && playerPos.y === 7 && !hasKey) {
     setHasKey(true);
     updateTile(9, 7, 'cave');
-    alert("You picked up the key!");
+    setSystemDialog("You picked up an iron key!");
+    setTimeout(() => setSystemDialog(''), 3000);
+    
   }
 
   // Unlock the chest
@@ -154,29 +193,50 @@ const handleInteraction = () => {
     setHasKey(false);
     setHasHatchet(true);
     updateTile(10, 13, 'cave');
-    alert("You unlocked the chest and found a hatchet!");
+    setSystemDialog("You unlocked the chest and found a hatchet!");
+setTimeout(() => setSystemDialog(''), 3000);
+
   }
 
-  // Chop the log
+  // 🚫 Interact with the log BEFORE having the hatchet
+  else if (isNextTo(4, 4) && !hasHatchet) {
+    setObstacleDialog("This tree looks solid... maybe something sharp could cut through?");
+    setTimeout(() => setObstacleDialog(''), 3000);
+  }
+
+  // ✅ Chop the log with hatchet
   else if (isNextTo(4, 4) && hasHatchet) {
     updateTile(4, 4, 'path');
     setPlayerPos((prev) => ({ ...prev }));
-    alert("You chopped the log and cleared the way!");
-  }
-  // Pick up the pickaxe
-else if (playerPos.x === 18 && playerPos.y === 7 && !hasPickaxe) {
-  setHasPickaxe(true);
-  updateTile(18, 7, 'cave');
-  alert("You picked up a pickaxe!");
-}
+    setSystemDialog("You chopped the log and cleared the way!");
+setTimeout(() => setSystemDialog(''), 3000);
 
-// Clear the rockslide
-else if (isNextTo(11, 9) && hasPickaxe) {
-  updateTile(11, 9, 'path');
-  setPlayerPos((prev) => ({ ...prev }));
-  alert("You cleared the rockslide with your pickaxe!");
-}
+  }
+
+  // Pick up the pickaxe
+  else if (playerPos.x === 18 && playerPos.y === 7 && !hasPickaxe) {
+    setHasPickaxe(true);
+    updateTile(18, 7, 'cave');
+    setSystemDialog("You picked up a pickaxe!");
+    setTimeout(() => setSystemDialog(''), 3000);
+  }
+
+  // 🚫 Interact with the rockslide BEFORE having the pickaxe
+  else if (isNextTo(11, 9) && !hasPickaxe) {
+    setObstacleDialog("A heavy rockslide blocks the way. You'll need something sturdy to clear this.");
+    setTimeout(() => setObstacleDialog(''), 3000);
+  }
+
+  // ✅ Clear the rockslide with pickaxe
+  else if (isNextTo(11, 9) && hasPickaxe) {
+    updateTile(11, 9, 'path');
+    setPlayerPos((prev) => ({ ...prev }));
+    setSystemDialog("You cleared the rockslide with your pickaxe!");
+    setTimeout(() => setSystemDialog(''), 3000);
+  }
 };
+
+
   // Handle keyboard inputs
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -216,7 +276,8 @@ useEffect(() => {
     playerPos.y === 16
   ) {
     setDeadEndTriggered(true);
-    alert(".....i bet you are feeling pretty silly right about now, you have reached a DEAD END!! hahaha!!");
+    setSystemDialog(".....I bet you're feeling pretty silly right about now, you have reached... a DEAD END!! hahaha!!");
+    setTimeout(() => setSystemDialog(''), 5000);
   }
 }, [playerPos, npcUnlocked, deadEndTriggered]);
 
@@ -233,30 +294,89 @@ const handleReset = () => {
   setExploredTiles(new Set()); // CLEAR explored tiles
 };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 space-y-6">
-      <h1 className="text-3xl font-bold">Grid-Venture</h1>
-      <button
-  onClick={handleReset}
-  className="absolute top-4 left-4 bg-green-600 hover:bg-red-600 text-white text-xs font-medium px-2 py-0.5 rounded shadow z-50"
->
-  Reset Game
-</button>
+return (
+  <div className="relative flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 space-y-6">
+    <h1 className="text-3xl font-bold">Grid-Venture</h1>
+
+    {/* Reset Button */}
+    <button
+      onClick={handleReset}
+      className="absolute top-4 left-4 bg-green-600 hover:bg-red-600 text-white text-xs font-medium px-2 py-0.5 rounded shadow z-50"
+    >
+      Reset Game
+    </button>
+
+    {/* Inventory Button */}
+    <button
+      onClick={() => setInventoryOpen(!inventoryOpen)}
+      className="absolute top-4 right-4 bg-blue-600 hover:bg-red-600 text-white text-xs font-medium px-2 py-0.5 rounded shadow z-50"
+    >
+      Inventory
+    </button>
+
+    {/* Explorer Points Display */}
+<div className="absolute top-4 right-24 bg-black border border-yellow-500 text-yellow-400 text-xs px-2 py-0.5 rounded shadow z-50">
+  🧭 Explorer: {explorerPoints}
+</div>
 
 
-      {/* Render Terrain Grid */}
-      <TerrainGrid
-        grid={grid}
-        playerPos={playerPos}
-        playerFrame={playerFrame}
-        playerDirection={playerDirection}
-        npcPos={npcPos}
-        npcUnlocked={npcUnlocked}
-        npcInteractionTriggered={npcInteractionTriggered}
-        setNpcUnlocked={setNpcUnlocked}
-        setNpcPos={setNpcPos}
-        exploredTiles={exploredTiles}
-      />
-    </div>
-  );
+    {/* Terrain Grid */}
+    <TerrainGrid
+      grid={grid}
+      playerPos={playerPos}
+      playerFrame={playerFrame}
+      playerDirection={playerDirection}
+      npcPos={npcPos}
+      npcUnlocked={npcUnlocked}
+      npcInteractionTriggered={npcInteractionTriggered}
+      setNpcUnlocked={setNpcUnlocked}
+      setNpcPos={setNpcPos}
+      exploredTiles={exploredTiles}
+    />
+
+    {/* Inventory Popup */}
+    {inventoryOpen && (
+      <div className="absolute top-16 right-4 bg-gray-800 border border-white text-white p-4 rounded shadow-lg z-40 w-48">
+        <h2 className="text-sm font-bold mb-2">Inventory</h2>
+        <ul className="text-xs space-y-1">
+          {hasKey && <li>🔑 Key</li>}
+
+          {hasHatchet && (
+            <li>
+              🪓 Hatchet
+              <p className="italic text-[10px] text-gray-300 mt-0.5">
+                – Looks rusted, sharp, and no Tetanus vaccine anywhere in this world!
+              </p>
+            </li>
+          )}
+
+          {hasPickaxe && (
+            <li>
+              ⛏️ Pickaxe
+              <p className="italic text-[10px] text-gray-300 mt-0.5">
+                – Just an old pickaxe... don’t get excited. It's not a "Diamond Pickaxe".... What do you think this is, Minecraft?!
+              </p>
+            </li>
+          )}
+
+          {!hasKey && !hasHatchet && !hasPickaxe && <li>(Empty)</li>}
+        </ul>
+      </div>
+    )}
+
+    {/* Obstacle Dialog Popup */}
+    {obstacleDialog && (
+      <div className="absolute bottom-8 bg-gray-900 text-white border border-white px-4 py-2 rounded shadow z-50">
+        {obstacleDialog}
+      </div>
+    )}
+
+    {/* System Dialog Popup */}
+    {systemDialog && (
+      <div className="absolute bottom-20 bg-gray-900 text-white border border-blue-400 px-4 py-2 rounded shadow z-50">
+        {systemDialog}
+      </div>
+    )}
+  </div>  
+);
 }

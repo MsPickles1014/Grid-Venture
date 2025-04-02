@@ -59,13 +59,14 @@ const alertClick = (e) =>{
     <>
       {/* NPC Icon */}
       <svg
-        className="w-8 h-8 absolute transition-all duration-100 ease-out"
-        viewBox="0 0 24 24"
-        fill="red"
-        onClick = {alertClick}
-      >
-        <circle cx="12" cy="12" r="10" />
-      </svg>
+  className="w-full h-full block"
+  viewBox="0 0 24 24"
+  fill="red"
+  onClick={alertClick}
+>
+  <rect x="2" y="2" width="20" height="20" />
+</svg>
+
 
       {/* NPC Dialog */}
       {npcDialog && (
