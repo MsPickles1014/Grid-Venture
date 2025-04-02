@@ -1,14 +1,18 @@
 // src/config/connection.ts
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-const connectToDB = async (): Promise<typeof mongoose.connection> => {
+dotenv.config();
+
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/geo-explorer';
+
+const connectToDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/geoExplorer');
-    console.log(`✅ MongoDB connected: ${conn.connection.host}`);
-    return conn.connection;
+    await mongoose.connect(MONGO_URI);
+    console.log('✅ MongoDB connected successfully');
   } catch (error) {
     console.error('❌ MongoDB connection error:', error);
-    throw new Error('Database connection failed.');
+    process.exit(1); // Exit the app if DB connection fails
   }
 };
 
