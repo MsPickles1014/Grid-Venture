@@ -26,6 +26,9 @@ const predefinedGrid = [
 ];
 // Manually place locked chest
 predefinedGrid[13][10] = 'lockedChest';
+predefinedGrid[9][11] = 'rockslide';   // y: 9, x: 11
+predefinedGrid[7][18] = 'pickaxe';     // y: 7, x: 18
+
 
 // Main Game Component
 export default function Game() {
@@ -39,6 +42,8 @@ export default function Game() {
   const [hasKey, setHasKey] = useState(false);
 const [hasHatchet, setHasHatchet] = useState(false);
 const [deadEndTriggered, setDeadEndTriggered] = useState(false);
+const [hasPickaxe, setHasPickaxe] = useState(false);
+
 
 
 
@@ -77,7 +82,8 @@ const [deadEndTriggered, setDeadEndTriggered] = useState(false);
     };
     return grid[y][x] === 'path' || 
           grid[y][x] === 'cave' || 
-          grid[y][x] === 'key';
+          grid[y][x] === 'key' ||
+          grid[y][x] === 'pickaxe'
   };
 
   // Check if player is next to NPC
@@ -154,8 +160,22 @@ const handleInteraction = () => {
   // Chop the log
   else if (isNextTo(4, 4) && hasHatchet) {
     updateTile(4, 4, 'path');
+    setPlayerPos((prev) => ({ ...prev }));
     alert("You chopped the log and cleared the way!");
   }
+  // Pick up the pickaxe
+else if (playerPos.x === 18 && playerPos.y === 7 && !hasPickaxe) {
+  setHasPickaxe(true);
+  updateTile(18, 7, 'cave');
+  alert("You picked up a pickaxe!");
+}
+
+// Clear the rockslide
+else if (isNextTo(11, 9) && hasPickaxe) {
+  updateTile(11, 9, 'path');
+  setPlayerPos((prev) => ({ ...prev }));
+  alert("You cleared the rockslide with your pickaxe!");
+}
 };
 
   // // Handle NPC interaction (press 'E')
@@ -213,10 +233,28 @@ useEffect(() => {
   }
 }, [playerPos, npcUnlocked, deadEndTriggered]);
 
+const handleReset = () => {
+  setGrid(predefinedGrid.map((row) => [...row])); // deep clone
+  setPlayerPos({ x: 3, y: 16 });
+  setNpcPos({ x: 12, y: 16 });
+  setNpcUnlocked(false);
+  setNpcInteractionTriggered(false);
+  setHasKey(false);
+  setHasHatchet(false);
+  setHasPickaxe(false);
+};
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 space-y-6">
       <h1 className="text-3xl font-bold">Grid-Venture</h1>
+      <button
+  onClick={handleReset}
+  className="absolute top-4 left-4 bg-green-600 hover:bg-red-600 text-white text-xs font-medium px-2 py-0.5 rounded shadow z-50"
+>
+  Reset Game
+</button>
+
 
       {/* Render Terrain Grid */}
       <TerrainGrid
