@@ -5,16 +5,15 @@ import Npc from './Npc';
 
 // Terrain tile classes mapped to CSS classes
 const terrainClasses = {
-  tree: 'bg-green-700', // Impassable tree tile
-  rock: 'bg-gray-500', // Obstacle tile (potentially requiring tools)
-  path: 'bg-yellow-800', // Walkable path
-  cave: 'bg-gray-300', // Walkable cave floor
-  log: 'bg-orange-900',      // Log obstacle (requires hatchet)
-  key: 'bg-blue-300',        // Key pickup tile
-  lockedChest: 'bg-yellow-500', // Locked chest tile
+  tree: 'bg-green-700',
+  rock: 'bg-gray-500',
+  path: 'bg-yellow-800',
+  cave: 'bg-gray-300',
+  log: 'bg-orange-900',
+  key: 'bg-blue-300',
+  lockedChest: 'bg-yellow-500',
   rockslide: 'bg-gray-800',
-pickaxe: 'bg-red-400',
-
+  pickaxe: 'bg-red-400',
 };
 
 // Function to check if position is within bounds
@@ -29,10 +28,14 @@ export default function TerrainGrid({
   playerDirection,
   npcPos,
   npcUnlocked,
-  npcInteractionTriggered, // 🚩 New prop
-  setNpcUnlocked, // 🚩 New prop
-  setNpcPos, // 🚩 New prop
+  npcInteractionTriggered,
+  setNpcUnlocked,
+  setNpcPos,
+  exploredTiles,
 }) {
+  const currentTile = grid[playerPos.y][playerPos.x];
+  const radius = currentTile === 'cave' ? 1 : 2;
+
   return (
     <div
       className="grid gap-[1px] border border-white"
@@ -45,37 +48,53 @@ export default function TerrainGrid({
       }}
     >
       {grid.map((row, y) =>
-        row.map((cell, x) => (
-          <div
-            key={`${x}-${y}`}
-            className={`${terrainClasses[cell] || 'bg-red-500'} border border-black relative`}
-          >
-            {/* Render Player */}
-            {playerPos.x === x && playerPos.y === y && (
-              <Player frame={playerFrame} direction={playerDirection} />
-            )}
+        row.map((cell, x) => {
+          const isVisible = exploredTiles.has(`${x},${y}`);
+          const isNearPlayer =
+            Math.abs(playerPos.x - x) <= radius &&
+            Math.abs(playerPos.y - y) <= radius;
+          const shouldRender = isVisible || isNearPlayer;
 
-            {/* Render NPC with bounds check */}
-            {npcPos.x === x && npcPos.y === y && (
-              <Npc
-                npcPos={npcPos}
-                unlocked={npcUnlocked}
-                onUnlock={() => {
-                  // Check NPC new position within bounds before moving
-                  const newNpcPos = { x: 12, y: 17 };
-                  if (isWithinBounds(newNpcPos.x, newNpcPos.y, grid)) {
-                    setNpcUnlocked(true); // Unlock NPC after 3 interactions
-                    // console.log("new npc pos: ", newNpcPos )
-                    setNpcPos(newNpcPos); // Move NPC to new position
-                  } else {
-                    console.error('🚨 New NPC position is out of bounds!');
-                  }
-                }}
-                triggerInteraction={npcInteractionTriggered} // Controls interaction
-              />
-            )}
-          </div>
-        ))
+          // Show 'rock' if the cave hasn't been explored yet
+          const displayTile = !shouldRender
+            ? 'black'
+            : cell === 'cave' && !exploredTiles.has(`${x},${y}`)
+            ? 'rock'
+            : cell;
+
+          return (
+            <div
+              key={`${x}-${y}`}
+              className={`relative border border-black ${
+                shouldRender ? terrainClasses[displayTile] : 'bg-black'
+              }`}
+            >
+              {/* Render Player */}
+              {playerPos.x === x && playerPos.y === y && (
+                <Player frame={playerFrame} direction={playerDirection} />
+              )}
+
+              {/* Render NPC with bounds check */}
+              
+              {npcPos.x === x && npcPos.y === y && exploredTiles.has(`${x},${y}`) && (
+  <Npc
+    npcPos={npcPos}
+    unlocked={npcUnlocked}
+    onUnlock={() => {
+      const newNpcPos = { x: 12, y: 17 };
+      if (isWithinBounds(newNpcPos.x, newNpcPos.y, grid)) {
+        setNpcUnlocked(true);
+        setNpcPos(newNpcPos);
+      } else {
+        console.error('🚨 New NPC position is out of bounds!');
+      }
+    }}
+    triggerInteraction={npcInteractionTriggered}
+  />
+)}
+            </div>
+          );
+        })
       )}
     </div>
   );
