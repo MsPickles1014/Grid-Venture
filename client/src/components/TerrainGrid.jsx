@@ -11,11 +11,11 @@ const terrainClasses = {
   tree: '/assets/tiles/Trees.png',
   path: '/assets/tiles/path.png',
   cave: '/assets/tiles/cave_floor.png',
-  log: 'bg-orange-900',
+  log: '/assets/tiles/log.png',
   key: '/assets/objects/Key.png',
   lockedChest: '/assets/objects/locked_chest.png',
   unlockedChest: '/assets/objects/unlocked_chest.png',
-  rockslide: 'bg-gray-800',
+  rockslide: '/assets/tiles/Rockslide.png',
   pickaxe: '/assets/objects/Pickaxe.png',
   secret: '/assets/tiles/Trees.png',
 };
@@ -46,8 +46,8 @@ export default function TerrainGrid({
       style={{
         gridTemplateColumns: `repeat(20, minmax(0, 1fr))`,
         gridAutoRows: '1fr',
-        width: '500px',
-        height: '500px',
+        width: '1600px',
+        height: '1600px',
         display: 'grid',
       }}
     >
@@ -99,7 +99,7 @@ export default function TerrainGrid({
 
         {/* FOREGROUND OBJECTS (like path, tree, etc.) */}
         {shouldRender &&
-          ['rock', 'path', 'tree', 'secret'].includes(cell) &&
+          ['rock', 'path', 'tree', 'secret', 'rockslide', 'log'].includes(cell) &&
           foregroundImage?.startsWith('/') && (
             <div
               className="absolute inset-0 z-40"
@@ -172,7 +172,7 @@ export default function TerrainGrid({
                     setNpcUnlocked(true);
                     setNpcPos(newNpcPos);
                   } else {
-                    console.error('🚨 New NPC position is out of bounds!');
+                    console.error(' New NPC position is out of bounds!');
                   }
                 }}
                 triggerInteraction={npcInteractionTriggered}

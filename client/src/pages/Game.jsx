@@ -193,7 +193,7 @@ setTimeout(() => setSystemDialog(''), 3000);
 
   // 🚫 Interact with the log BEFORE having the hatchet
   else if (isNextTo(4, 4) && !hasHatchet) {
-    setObstacleDialog("This tree looks solid... maybe something sharp could cut through?");
+    setObstacleDialog("This log is blocking the way and looks solid... maybe something sharp could cut through?");
     setTimeout(() => setObstacleDialog(''), 3000);
   }
 
@@ -216,7 +216,7 @@ setTimeout(() => setSystemDialog(''), 3000);
 
   // 🚫 Interact with the rockslide BEFORE having the pickaxe
   else if (isNextTo(11, 9) && !hasPickaxe) {
-    setObstacleDialog("A heavy rockslide blocks the way. You'll need something sturdy to clear this.");
+    setObstacleDialog("It appears that a rockslide recently occurred and now a giant boulder blocks the path, You'll need something sturdy to clear the way.");
     setTimeout(() => setObstacleDialog(''), 4000);
   }
 
@@ -224,7 +224,7 @@ setTimeout(() => setSystemDialog(''), 3000);
   else if (isNextTo(11, 9) && hasPickaxe) {
     updateTile(11, 9, 'path');
     setPlayerPos((prev) => ({ ...prev }));
-    setSystemDialog("You cleared the rockslide with your pickaxe!");
+    setSystemDialog("You cleared the giant boulder with your pickaxe!");
     setTimeout(() => setSystemDialog(''), 3000);
   }
 };
