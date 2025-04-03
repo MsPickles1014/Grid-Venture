@@ -60,8 +60,7 @@ export default function TerrainGrid({
     const shouldRender = isVisible || isNearPlayer;
 
     const caveObjects = ['key', 'pickaxe', 'lockedChest', 'unlockedChest'];
-    const currentTile = grid[playerPos.y][playerPos.x];
-    const playerIsInsideCave = grid[playerPos.y][playerPos.x] === 'cave';
+    const playerIsInsideCave = currentTile === 'cave' || caveObjects.includes(currentTile);
 
     // BASE IMAGE: what the tile looks like *underneath*
     let baseImage = terrainClasses['ground'];
@@ -69,11 +68,11 @@ export default function TerrainGrid({
     if (!shouldRender) {
       baseImage = null;
     } else if (cell === 'rock') {
-      baseImage = terrainClasses['rockBackground']; // ✅ always background
+      baseImage = terrainClasses['rockBackground']; // always background
     } else if (cell === 'cave' || caveObjects.includes(cell)) {
       baseImage = playerIsInsideCave
         ? terrainClasses['cave']
-        : terrainClasses['rockBackground']; // ✅ only show cave floor inside
+        : terrainClasses['rockBackground']; // only show cave floor inside
     }
     
 
