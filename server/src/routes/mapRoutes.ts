@@ -1,9 +1,9 @@
-// import express from 'express';
-// import { startGameSession } from '../controllers/mapController';
+import express from 'express';
+import { startGameSession } from '../controllers/mapController';
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.post('/game/start', startGameSession);
+router.post('/game/start', startGameSession);
 
-// export default router;
-// //
+export default router;
+//
