@@ -49,6 +49,9 @@ const [inventoryOpen, setInventoryOpen] = useState(false);
 const [obstacleDialog, setObstacleDialog] = useState('');
 const [systemDialog, setSystemDialog] = useState('');
 const [explorerPoints, setExplorerPoints] = useState(0);
+const [storeOpen, setStoreOpen] = useState(false);
+const [purchasedItems, setPurchasedItems] = useState([]);
+
 
 
 
@@ -93,61 +96,44 @@ const [explorerPoints, setExplorerPoints] = useState(0);
 
   // Move player with bounds check
   const movePlayer = (dx, dy, npc) => {
-    setPlayerPos((prev) => {
-      const { x: newX, y: newY } = getBoundedPosition(prev.x + dx, prev.y + dy);
-      if (isWalkable(newX, newY, npc)) {
-        setPlayerDirection(getDirection(dx, dy));
-        animatePlayer();
+    const { x: newX, y: newY } = getBoundedPosition(playerPos.x + dx, playerPos.y + dy);
   
-        // 👁️ Visibility radius logic
-        const currentTile = grid[newY][newX];
-        const radius = currentTile === 'cave' ? 1 : 2;
-
-        const newExplored = new Set(exploredTiles);
-let newPoints = 0;
-
-for (let dx = -radius; dx <= radius; dx++) {
-  for (let dy = -radius; dy <= radius; dy++) {
-    const ex = newX + dx;
-    const ey = newY + dy;
-    const key = `${ex},${ey}`;
-    if (
-      ex >= 0 &&
-      ex < grid[0].length &&
-      ey >= 0 &&
-      ey < grid.length &&
-      !newExplored.has(key)
-    ) {
-      newExplored.add(key);
-      newPoints += 1; // Award 1 point per new tile
-    }
-  }
-}
-
-setExploredTiles(newExplored);
-setExplorerPoints((prev) => prev + newPoints);
-
-
-
-
-
-        // const newExplored = new Set(exploredTiles);
-        // for (let dx = -radius; dx <= radius; dx++) {
-        //   for (let dy = -radius; dy <= radius; dy++) {
-        //     const ex = newX + dx;
-        //     const ey = newY + dy;
-        //     if (ex >= 0 && ex < grid[0].length && ey >= 0 && ey < grid.length) {
-        //       newExplored.add(`${ex},${ey}`);
-        //     }
-        //   }
-        // }
-        // setExploredTiles(newExplored);
+    // ✅ Always animate and face direction — even if not walkable
+    setPlayerDirection(getDirection(dx, dy));
+    animatePlayer();
   
-        return { x: newX, y: newY };
+    // ✅ Only update position and visibility if move is valid
+    if (isWalkable(newX, newY, npc)) {
+      const currentTile = grid[newY][newX];
+      const radius = currentTile === 'cave' ? 1 : 2;
+  
+      const newExplored = new Set(exploredTiles);
+      let newPoints = 0;
+  
+      for (let dx = -radius; dx <= radius; dx++) {
+        for (let dy = -radius; dy <= radius; dy++) {
+          const ex = newX + dx;
+          const ey = newY + dy;
+          const key = `${ex},${ey}`;
+          if (
+            ex >= 0 &&
+            ex < grid[0].length &&
+            ey >= 0 &&
+            ey < grid.length &&
+            !newExplored.has(key)
+          ) {
+            newExplored.add(key);
+            newPoints += 1;
+          }
+        }
       }
-      return prev;
-    });
+  
+      setExploredTiles(newExplored);
+      setExplorerPoints((prev) => prev + newPoints);
+      setPlayerPos({ x: newX, y: newY });
+    }
   };
+  
   
   // Determine direction for animation
   const getDirection = (dx, dy) => {
@@ -189,6 +175,12 @@ const handleInteraction = () => {
   }
 
   // Unlock the chest
+  // 🚫 Interact with chest BEFORE having the key
+else if (isNextTo(10, 13) && !hasKey) {
+  setObstacleDialog("A locked chest!!!... of course... Why is there *always* a locked chest in a cave?");
+  setTimeout(() => setObstacleDialog(''), 4000);
+}
+
   else if (isNextTo(10, 13) && hasKey) {
     setHasKey(false);
     setHasHatchet(true);
@@ -224,7 +216,7 @@ setTimeout(() => setSystemDialog(''), 3000);
   // 🚫 Interact with the rockslide BEFORE having the pickaxe
   else if (isNextTo(11, 9) && !hasPickaxe) {
     setObstacleDialog("A heavy rockslide blocks the way. You'll need something sturdy to clear this.");
-    setTimeout(() => setObstacleDialog(''), 3000);
+    setTimeout(() => setObstacleDialog(''), 4000);
   }
 
   // ✅ Clear the rockslide with pickaxe
@@ -270,8 +262,8 @@ setTimeout(() => setSystemDialog(''), 3000);
   // Tile trigger for the DEAD END message
 useEffect(() => {
   if (
-    npcUnlocked &&                     // Only after NPC has moved
-    !deadEndTriggered &&               // Only fire once
+    npcUnlocked &&                     
+    !deadEndTriggered && 
     playerPos.x === 10 &&
     playerPos.y === 16
   ) {
@@ -281,8 +273,20 @@ useEffect(() => {
   }
 }, [playerPos, npcUnlocked, deadEndTriggered]);
 
+const purchaseItem = (itemName, cost) => {
+  if (explorerPoints >= cost) {
+    setExplorerPoints((prev) => prev - cost);
+    setPurchasedItems((prev) => [...prev, itemName]);
+    setSystemDialog(`You purchased: ${itemName}`);
+    setTimeout(() => setSystemDialog(''), 3000);
+  } else {
+    setSystemDialog("Not enough points!");
+    setTimeout(() => setSystemDialog(''), 3000);
+  }
+};
+
 const handleReset = () => {
-  setGrid(predefinedGrid.map((row) => [...row])); // deep clone
+  setGrid(predefinedGrid.map((row) => [...row])); 
   setPlayerPos({ x: 3, y: 16 }); // start position
   setNpcPos({ x: 12, y: 16 });   // NPC reset
   setNpcUnlocked(false);
@@ -292,6 +296,9 @@ const handleReset = () => {
   setHasPickaxe(false);
   setDeadEndTriggered(false);
   setExploredTiles(new Set()); // CLEAR explored tiles
+  setStoreOpen(false);
+setPurchasedItems([]);
+
 };
 
 return (
@@ -305,6 +312,13 @@ return (
     >
       Reset Game
     </button>
+    {/* Store Button */}
+<button
+  onClick={() => setStoreOpen(!storeOpen)}
+  className="absolute top-4 left-28 bg-purple-700 hover:bg-purple-900 text-white text-xs font-medium px-2 py-0.5 rounded shadow z-50"
+>
+  Store
+</button>
 
     {/* Inventory Button */}
     <button
@@ -317,6 +331,7 @@ return (
     {/* Explorer Points Display */}
 <div className="absolute top-4 right-24 bg-black border border-yellow-500 text-yellow-400 text-xs px-2 py-0.5 rounded shadow z-50">
   🧭 Explorer: {explorerPoints}
+
 </div>
 
 
@@ -333,6 +348,45 @@ return (
       setNpcPos={setNpcPos}
       exploredTiles={exploredTiles}
     />
+
+{storeOpen && (
+  <div className="absolute top-16 left-4 bg-gray-800 border border-purple-400 text-white p-4 rounded shadow-lg z-40 w-52">
+    <h2 className="text-sm font-bold mb-2">Explorer Store 🛍️</h2>
+    <ul className="text-xs space-y-2">
+      <li className="flex justify-between items-center">
+        Fancy Hat (10 pts)
+        <button
+          className="bg-yellow-600 hover:bg-yellow-700 text-white px-1 py-0.5 rounded text-xs"
+          onClick={() => purchaseItem("Fancy Hat", 10)}
+        >
+          Buy
+        </button>
+      </li>
+      <li className="flex justify-between items-center">
+        Cool Boots (15 pts)
+        <button
+          className="bg-yellow-600 hover:bg-yellow-700 text-white px-1 py-0.5 rounded text-xs"
+          onClick={() => purchaseItem("Cool Boots", 15)}
+        >
+          Buy
+        </button>
+      </li>
+      <li className="flex justify-between items-center">
+        Mystery Box (25 pts)
+        <button
+          className="bg-yellow-600 hover:bg-yellow-700 text-white px-1 py-0.5 rounded text-xs"
+          onClick={() => purchaseItem("Mystery Box", 25)}
+        >
+          Buy
+        </button>
+      </li>
+    </ul>
+    <div className="text-[10px] italic text-gray-400 mt-2">
+      Points: {explorerPoints}
+    </div>
+  </div>
+)}
+
 
     {/* Inventory Popup */}
     {inventoryOpen && (
