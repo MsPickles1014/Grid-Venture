@@ -10,31 +10,58 @@ const signToken = (userId: string, username: string) => {
   return jwt.sign({ userId, username }, JWT_SECRET, { expiresIn: '1h' });
 };
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, password } = req.body;
 
-    // Check if username is already taken
     const existingUser = await User.findOne({ username });
-    if (existingUser) return res.status(400).json({ message: 'Username already exists' });
+    if (existingUser) {
+      res.status(400).json({ message: 'Username already exists' });
+      return;
+    }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
     const user = await User.create({ username, password: hashedPassword });
 
-    // Generate JWT (no password in payload!)
     const token = signToken(user._id.toString(), user.username);
-    console.log('✅ JWT Token generated:', token); // 👈 add this line
+    console.log('✅ JWT Token generated:', token);
 
-
-    return res.status(201).json({
+    res.status(201).json({
       token,
       user: { id: user._id, username: user.username },
     });
   } catch (error) {
     console.error('User creation error:', error);
-    return res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      res.status(400).json({ message: 'Invalid username or password' });
+      return;
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      res.status(400).json({ message: 'Invalid username or password' });
+      return;
+    }
+
+    const token = signToken(user._id.toString(), user.username);
+    console.log('✅ Login JWT Token generated:', token);
+
+    res.json({
+      token,
+      user: { id: user._id, username: user.username },
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error during login' });
   }
 };

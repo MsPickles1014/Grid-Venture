@@ -1,24 +1,13 @@
 {
   "name": "grid-venture",
   "version": "1.0.0",
-  "description": "",
-  "main": "server/server.js",
+  "private": true,
   "scripts": {
-    "start": "npm run client:dev && npm run server:build",
-    "start:dev": "concurrently \"cd server && npm run watch\" \"cd client && npm run dev\"",
-    "server:dev": "cd server && npm run watch",
-    "server": "cd server && npm run start",
-    "install": "cd server && npm i && cd ../client && npm i",
-    "build": "npm run server:build &&  npm run client:dev ",
-    "client:build": "cd client && npm run build",
-    "server:build": "cd server && npm run build",
-    "render-build": "npm install && npm run build"
+    "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
+    "build": "npm run build --prefix client && npm run build --prefix server",
+    "start": "concurrently \"npm run start --prefix client\" \"npm run start --prefix server\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.2"
   }
-
 }
