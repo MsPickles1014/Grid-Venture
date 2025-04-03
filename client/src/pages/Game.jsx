@@ -28,7 +28,8 @@ const predefinedGrid = [
 predefinedGrid[13][10] = 'lockedChest';
 predefinedGrid[9][11] = 'rockslide';   // y: 9, x: 11
 predefinedGrid[7][18] = 'pickaxe';     // y: 7, x: 18
-// s
+predefinedGrid[7][9] = 'key'; // Correctly places the key
+
 
 
 // Main Game Component
@@ -184,7 +185,7 @@ else if (isNextTo(10, 13) && !hasKey) {
   else if (isNextTo(10, 13) && hasKey) {
     setHasKey(false);
     setHasHatchet(true);
-    updateTile(10, 13, 'cave');
+    updateTile(10, 13, 'unlockedChest');
     setSystemDialog("You unlocked the chest and found a hatchet!");
 setTimeout(() => setSystemDialog(''), 3000);
 
