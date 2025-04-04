@@ -31,7 +31,7 @@ export default function Login({ onAuthSuccess }) {
         placeholder="Username"
         value={form.username}
         onChange={handleChange}
-        className="w-full border p-2 mb-3 rounded"
+        className={`w-full border p-2 mb-3 rounded text-black ${form.username ? 'border-green-500' : 'border-gray-300'}`} 
         required
       />
       <input
@@ -40,7 +40,7 @@ export default function Login({ onAuthSuccess }) {
         placeholder="Password"
         value={form.password}
         onChange={handleChange}
-        className="w-full border p-2 mb-3 rounded"
+        className={`w-full border p-2 mb-3 rounded text-black ${form.username ? 'border-green-500' : 'border-gray-300'}`} 
         required
       />
       <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded w-full">Login</button>
