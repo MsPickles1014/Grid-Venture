@@ -23,6 +23,11 @@ const [systemDialog, setSystemDialog] = useState('');
 const [explorerPoints, setExplorerPoints] = useState(0);
 const [storeOpen, setStoreOpen] = useState(false);
 const [purchasedItems, setPurchasedItems] = useState([]);
+const [dialogActive, setDialogActive] = useState(false);
+const [dialogImage, setDialogImage] = useState('');
+const [dialogMessages, setDialogMessages] = useState([]);
+const [dialogIndex, setDialogIndex] = useState(0);
+
 
   // Prevent out-of-bounds movement
   const getBoundedPosition = (x, y) => ({
