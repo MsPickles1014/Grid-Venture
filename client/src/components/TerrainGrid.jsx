@@ -11,7 +11,7 @@ const terrainClasses = {
   tree: '/assets/tiles/Trees.png',
   path: '/assets/tiles/path.png',
   cave: '/assets/tiles/cave_floor.png',
-  log: '/assets/tiles/log.png',
+  log: '/assets/objects/log.png',
   key: '/assets/objects/Key.png',
   lockedChest: '/assets/objects/locked_chest.png',
   unlockedChest: '/assets/objects/unlocked_chest.png',
