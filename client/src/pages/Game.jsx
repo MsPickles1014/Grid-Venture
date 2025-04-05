@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import TerrainGrid from '../components/TerrainGrid';
 import predefinedGrid from '../data/predefinedGrid';
+import DialogBox from '../components/DialogBox';
 
 // Main Game Component
 export default function Game() {
@@ -27,6 +28,16 @@ const [dialogActive, setDialogActive] = useState(false);
 const [dialogImage, setDialogImage] = useState('');
 const [dialogMessages, setDialogMessages] = useState([]);
 const [dialogIndex, setDialogIndex] = useState(0);
+const [npcDialogStage, setNpcDialogStage] = useState(0);
+const [activeDialogType, setActiveDialogType] = useState(null); // e.g., 'npc_joker'
+const hudImages = {
+  npcJester: '/assets/characters/the-Jester\'s-HUD-face.png',
+  log: '/assets/objects/log_face.png',
+  key: '/assets/objects/Key-HUD.png',
+  chestLocked: '/assets/objects/locked_chest_oil.png', 
+  chestUnlocked: '/assets/objects/unlocked_chest_oil.png',
+
+};
 
 
   // Prevent out-of-bounds movement
@@ -132,42 +143,92 @@ const updateTile = (x, y, newType) => {
 };
 
 const handleInteraction = () => {
-  // Interact with NPC
-  if (isNextToNpc() && !npcInteractionTriggered) {
-    setNpcInteractionTriggered(true);
-    setTimeout(() => setNpcInteractionTriggered(false), 200);
+  if (isNextToNpc() && !npcUnlocked && !dialogActive) {
+    const npcMessages = [
+      "YOU SHALL NOT PASS!!",
+      "I'm thuper therial, you don’t want to go down thith way….",
+      "You REALLY want to go down this path?! …FINE! have it your way…",
+    ];
+  
+    setDialogImage(hudImages.npcJester);
+    setDialogMessages([npcMessages[npcDialogStage]]);
+    setDialogIndex(0);
+    setDialogActive(true);
+    setActiveDialogType('npc_joker');
+  
+    // 🚩 Move this increment HERE instead of inside the key handler
+    if (npcDialogStage < 2) {
+      setNpcDialogStage((prev) => prev + 1);
+    } else {
+      setNpcUnlocked(true);
+      setNpcPos((prev) => ({ x: prev.x, y: prev.y + 1 }));
+    }
+    return;
   }
 
   // Pick up the key
-  else if (playerPos.x === 9 && playerPos.y === 7 && !hasKey) {
+  else if (playerPos.x === 9 && playerPos.y === 7 && !hasKey && !dialogActive) {
     setHasKey(true);
     updateTile(9, 7, 'cave');
-    setSystemDialog("You picked up an iron key!");
-    setTimeout(() => setSystemDialog(''), 3000);
-    
+    setDialogImage('/assets/objects/Key-HUD.png'); // 🔑 Key face HUD
+    setDialogMessages([
+      "You picked up a heavy iron key...",
+      "It feels cold in your hand, and somehow important."
+    ]);
+    setDialogIndex(0);
+    setDialogActive(true);
+    setActiveDialogType('key');
+    return;
   }
+  
 
   // Unlock the chest
   // 🚫 Interact with chest BEFORE having the key
-else if (isNextTo(10, 13) && !hasKey) {
-  setObstacleDialog("A locked chest!!!... of course... Why is there *always* a locked chest in a cave?");
-  setTimeout(() => setObstacleDialog(''), 4000);
-}
-
-  else if (isNextTo(10, 13) && hasKey) {
+  else if (isNextTo(10, 13) && !hasKey && !dialogActive) {
+    setDialogImage(hudImages.chestLocked);
+    setDialogMessages([
+      "The chest is locked tight.",
+      "You jiggle the latch a bit...",
+      "...but unless you've got a key, it's not opening anytime soon."
+    ]);
+    setDialogIndex(0);
+    setDialogActive(true);
+    setActiveDialogType('chest_locked');
+    return;
+  }
+  
+  else if (isNextTo(10, 13) && hasKey && !dialogActive) {
     setHasKey(false);
     setHasHatchet(true);
     updateTile(10, 13, 'unlockedChest');
-    setSystemDialog("You unlocked the chest and found a hatchet!");
-setTimeout(() => setSystemDialog(''), 3000);
-
+  
+    setDialogImage(hudImages.chestUnlocked); // ✅ Show open chest
+    setDialogMessages([
+      "You slide the key into the lock...",
+      "With a loud *click*, it swings open!",
+      "Inside you find... a rusted hatchet. Perfect for clearing obstacles!"
+    ]);
+    setDialogIndex(0);
+    setDialogActive(true);
+    setActiveDialogType('chest_unlocked');
+    return;
   }
+  
 
   // 🚫 Interact with the log BEFORE having the hatchet
-  else if (isNextTo(4, 4) && !hasHatchet) {
-    setObstacleDialog("This log is blocking the way and looks solid... maybe something sharp could cut through?");
-    setTimeout(() => setObstacleDialog(''), 3000);
+  else if (isNextTo(4, 4) && !hasHatchet && !dialogActive) {
+    setDialogImage(hudImages.log);
+    setDialogMessages([
+      "This log is blocking the way...",
+      "It looks solid... maybe something sharp could cut through?"
+    ]);
+    setDialogIndex(0);
+    setDialogActive(true);
+    setActiveDialogType('log');
+    return;
   }
+  
+  
 
   // ✅ Chop the log with hatchet
   else if (isNextTo(4, 4) && hasHatchet) {
@@ -205,32 +266,52 @@ setTimeout(() => setSystemDialog(''), 3000);
   // Handle keyboard inputs
   useEffect(() => {
     const handleKeyDown = (e) => {
-      switch (e.key.toLowerCase()) {
+      const key = e.key.toLowerCase();
+  
+      switch (key) {
         case 'w':
-          movePlayer(0, -1, npcPos);
+          if (!dialogActive) movePlayer(0, -1, npcPos);
           break;
+  
         case 'a':
-          movePlayer(-1, 0, npcPos);
+          if (!dialogActive) movePlayer(-1, 0, npcPos);
           break;
+  
         case 's':
-          movePlayer(0, 1, npcPos);
+          if (!dialogActive) movePlayer(0, 1, npcPos);
           break;
+  
         case 'd':
-          movePlayer(1, 0, npcPos);
+          if (!dialogActive) movePlayer(1, 0, npcPos);
           break;
-        case 'e':
-          handleInteraction();
-          break;
-        default:
-          break;
+  
+          case 'e':
+            if (dialogActive) {
+              if (dialogIndex < dialogMessages.length - 1) {
+                // Advance to next line of current dialog
+                setDialogIndex((prev) => prev + 1);
+              } else {
+                // End of dialog
+                setDialogActive(false);
+                setDialogImage('');
+                setDialogMessages([]);
+                setDialogIndex(0);
+                setActiveDialogType(null);
+              }
+            } else {
+              // No dialog open — attempt interaction
+              handleInteraction();
+            }
+            break;
       }
     };
-
+  
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [npcPos, playerPos]);
+  }, [npcPos, playerPos, dialogActive, dialogIndex, dialogMessages]);
+  
 
   // Tile trigger for the DEAD END message
 useEffect(() => {
@@ -406,6 +487,12 @@ return (
         {systemDialog}
       </div>
     )}
+    <DialogBox
+  image={dialogImage}
+  message={dialogMessages[dialogIndex]}
+  isVisible={dialogActive}
+/>
+
   </div> // ✅ closes the full return's wrapper
 );         // ✅ closes the return statement
 
