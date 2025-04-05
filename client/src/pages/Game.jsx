@@ -1,36 +1,7 @@
 // src/Game.jsx
 import React, { useState, useEffect } from 'react';
 import TerrainGrid from '../components/TerrainGrid';
-
-const predefinedGrid = [
-  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock'],
-  ['tree', 'tree', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'tree', 'path', 'path', 'path', 'path', 'cave', 'cave', 'cave', 'cave', 'rock'],
-  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'secret', 'tree', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
-  ['tree', 'tree', 'tree', 'tree', 'path', 'path', 'path', 'path', 'path', 'path', 'path', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
-  ['tree', 'tree', 'tree', 'tree', 'log', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
-  ['tree', 'tree', 'path', 'path', 'path', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
-  ['tree', 'tree', 'path', 'rock', 'rock', 'path', 'tree', 'tree', 'tree', 'rock', 'rock', 'path', 'tree', 'tree', 'rock', 'cave', 'cave', 'cave', 'cave', 'rock'],
-  ['tree', 'tree', 'path', 'rock', 'cave', 'cave', 'rock', 'rock', 'rock', 'key', 'rock', 'path', 'tree', 'tree', 'rock', 'rock', 'rock', 'rock', 'cave', 'rock'],
-  ['tree', 'tree', 'path', 'rock', 'cave', 'cave', 'cave', 'cave', 'cave', 'cave', 'rock', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'rock', 'rock', 'rock'],
-  ['tree', 'tree', 'path', 'rock', 'cave', 'cave', 'cave', 'cave', 'cave', 'cave', 'rock', 'path', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree'],
-  ['tree', 'tree', 'path', 'rock', 'cave', 'cave', 'cave', 'cave', 'cave', 'cave', 'rock', 'rock', 'path', 'path', 'path', 'path', 'path', 'path', 'path', 'tree'],
-  ['tree', 'tree', 'path', 'rock', 'cave', 'cave', 'rock', 'rock', 'cave', 'cave', 'cave', 'rock', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree'],
-  ['tree', 'tree', 'path', 'rock', 'cave', 'cave', 'rock', 'rock', 'cave', 'rock', 'rock', 'rock', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree'],
-  ['tree', 'tree', 'path', 'rock', 'rock', 'cave', 'cave', 'cave', 'cave', 'cave', 'cave', 'rock', 'tree', 'path', 'path', 'path', 'path', 'tree', 'path', 'tree'],
-  ['tree', 'tree', 'path', 'path', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'tree', 'path', 'tree', 'tree', 'path', 'tree', 'path', 'tree'],
-  ['tree', 'tree', 'tree', 'path', 'secret', 'secret', 'secret', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'path', 'tree', 'path', 'tree'],
-  ['tree', 'tree', 'tree', 'path', 'tree', 'tree', 'secret', 'tree', 'tree', 'path', 'path', 'path', 'path', 'path', 'tree', 'tree', 'path', 'tree', 'path', 'tree'],
-  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'secret', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'path', 'path', 'path', 'tree'],
-  ['tree', 'tree', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'secret', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree'],
-  ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'path', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree'],
-];
-// Manually place locked chest
-predefinedGrid[13][10] = 'lockedChest';
-predefinedGrid[9][11] = 'rockslide';   // y: 9, x: 11
-predefinedGrid[7][18] = 'pickaxe';     // y: 7, x: 18
-predefinedGrid[7][9] = 'key'; // Correctly places the key
-
-
+import predefinedGrid from '../data/predefinedGrid';
 
 // Main Game Component
 export default function Game() {
@@ -52,10 +23,6 @@ const [systemDialog, setSystemDialog] = useState('');
 const [explorerPoints, setExplorerPoints] = useState(0);
 const [storeOpen, setStoreOpen] = useState(false);
 const [purchasedItems, setPurchasedItems] = useState([]);
-
-
-
-
 
   // Prevent out-of-bounds movement
   const getBoundedPosition = (x, y) => ({
@@ -303,99 +270,104 @@ setPurchasedItems([]);
 };
 
 return (
-  <div className="relative flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 space-y-6">
-    <h1 className="text-3xl font-bold">Grid-Venture</h1>
+  <div className="relative w-screen h-screen bg-gray-900 text-white overflow-hidden">
 
-    {/* Reset Button */}
-    <button
-      onClick={handleReset}
-      className="absolute top-4 left-4 bg-green-600 hover:bg-red-600 text-white text-xs font-medium px-2 py-0.5 rounded shadow z-50"
-    >
-      Reset Game
-    </button>
-    {/* Store Button */}
-<button
-  onClick={() => setStoreOpen(!storeOpen)}
-  className="absolute top-4 left-28 bg-purple-700 hover:bg-purple-900 text-white text-xs font-medium px-2 py-0.5 rounded shadow z-50"
->
-  Store
-</button>
+    {/* HUD Overlay */}
+    <div className="absolute top-0 left-0 right-0 z-50 p-4 flex justify-between items-start pointer-events-none bg-[#2c2b28] bg-opacity-95 shadow-md">
 
-    {/* Inventory Button */}
-    <button
-      onClick={() => setInventoryOpen(!inventoryOpen)}
-      className="absolute top-4 right-4 bg-blue-600 hover:bg-red-600 text-white text-xs font-medium px-2 py-0.5 rounded shadow z-50"
-    >
-      Inventory
-    </button>
+      {/* Left Controls */}
+      <div className="space-x-2 pointer-events-auto">
+        <button
+          onClick={handleReset}
+          className="bg-amber-900 hover:bg-amber-800 text-amber-100 text-xs font-medium px-3 py-3 rounded shadow border border-yellow-900"
+        >
+          Reset Game
+        </button>
+        <button
+          onClick={() => setStoreOpen(!storeOpen)}
+          className="bg-yellow-800 hover:bg-yellow-700 text-yellow-200 text-xs font-medium px-4 py-2 rounded shadow border border-yellow-900"
 
-    {/* Explorer Points Display */}
-<div className="absolute top-4 right-24 bg-black border border-yellow-500 text-yellow-400 text-xs px-2 py-0.5 rounded shadow z-50">
-  🧭 Explorer: {explorerPoints}
+        >
+          Store
+        </button>
+      </div>
 
+      {/* Title Center */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold">Grid-Venture</h1>
+      </div>
+
+      {/* Right Controls */}
+      <div className="flex flex-col items-center pointer-events-auto space-y-2">
+  <button
+    onClick={() => setInventoryOpen(!inventoryOpen)}
+    className="bg-stone-700 hover:bg-stone-600 text-stone-200 text-xs font-medium px-4 py-3 rounded shadow border border-stone-500"
+  >
+    Inventory
+  </button>
+  <div className="bg-black border border-yellow-500 text-yellow-400 text-xs px-3 py-1 rounded shadow text-center">
+    🧭 Explorer: {explorerPoints}
+  </div>
 </div>
 
-
-    {/* Terrain Grid */}
-    <TerrainGrid
-      grid={grid}
-      playerPos={playerPos}
-      playerFrame={playerFrame}
-      playerDirection={playerDirection}
-      npcPos={npcPos}
-      npcUnlocked={npcUnlocked}
-      npcInteractionTriggered={npcInteractionTriggered}
-      setNpcUnlocked={setNpcUnlocked}
-      setNpcPos={setNpcPos}
-      exploredTiles={exploredTiles}
-    />
-
-{storeOpen && (
-  <div className="absolute top-16 left-4 bg-gray-800 border border-purple-400 text-white p-4 rounded shadow-lg z-40 w-52">
-    <h2 className="text-sm font-bold mb-2">Explorer Store 🛍️</h2>
-    <ul className="text-xs space-y-2">
-      <li className="flex justify-between items-center">
-        Fancy Hat (10 pts)
-        <button
-          className="bg-yellow-600 hover:bg-yellow-700 text-white px-1 py-0.5 rounded text-xs"
-          onClick={() => purchaseItem("Fancy Hat", 10)}
-        >
-          Buy
-        </button>
-      </li>
-      <li className="flex justify-between items-center">
-        Cool Boots (15 pts)
-        <button
-          className="bg-yellow-600 hover:bg-yellow-700 text-white px-1 py-0.5 rounded text-xs"
-          onClick={() => purchaseItem("Cool Boots", 15)}
-        >
-          Buy
-        </button>
-      </li>
-      <li className="flex justify-between items-center">
-        Mystery Box (25 pts)
-        <button
-          className="bg-yellow-600 hover:bg-yellow-700 text-white px-1 py-0.5 rounded text-xs"
-          onClick={() => purchaseItem("Mystery Box", 25)}
-        >
-          Buy
-        </button>
-      </li>
-    </ul>
-    <div className="text-[10px] italic text-gray-400 mt-2">
-      Points: {explorerPoints}
     </div>
-  </div>
-)}
 
+    {/* Grid Camera Area */}
+    <div className="w-full h-full overflow-hidden absolute inset-0 z-0">
+      <div
+        className="absolute transition-transform duration-300 ease-in-out"
+        style={{
+          transform: `translate(calc(50vw - ${playerPos.x * 5}vw), calc(50vh - ${playerPos.y * 5}vw))`,
+        }}
+      >
+        <TerrainGrid
+          grid={grid}
+          playerPos={playerPos}
+          playerFrame={playerFrame}
+          playerDirection={playerDirection}
+          npcPos={npcPos}
+          npcUnlocked={npcUnlocked}
+          npcInteractionTriggered={npcInteractionTriggered}
+          setNpcUnlocked={setNpcUnlocked}
+          setNpcPos={setNpcPos}
+          exploredTiles={exploredTiles}
+        />
+      </div>
+    </div>
+
+    {/* Store Popup */}
+    {storeOpen && (
+      <div className="absolute top-20 left-4 bg-gray-800 border border-purple-400 text-white p-4 rounded shadow-lg z-50 w-52">
+        <h2 className="text-sm font-bold mb-2">Explorer Store 🛍️</h2>
+        <ul className="text-xs space-y-2">
+          {[
+            ["Fancy Hat", 10],
+            ["Cool Boots", 15],
+            ["Mystery Box", 25],
+          ].map(([item, cost]) => (
+            <li key={item} className="flex justify-between items-center">
+              {item} ({cost} pts)
+              <button
+                className="bg-yellow-600 hover:bg-yellow-700 text-white px-1 py-0.5 rounded text-xs"
+                onClick={() => purchaseItem(item, cost)}
+              >
+                Buy
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="text-[10px] italic text-gray-400 mt-2">
+          Points: {explorerPoints}
+        </div>
+      </div>
+    )}
 
     {/* Inventory Popup */}
     {inventoryOpen && (
-      <div className="absolute top-16 right-4 bg-gray-800 border border-white text-white p-4 rounded shadow-lg z-40 w-48">
+      <div className="absolute top-20 right-4 bg-gray-800 border border-white text-white p-4 rounded shadow-lg z-50 w-48">
         <h2 className="text-sm font-bold mb-2">Inventory</h2>
         <ul className="text-xs space-y-1">
           {hasKey && <li>🔑 Key</li>}
-
           {hasHatchet && (
             <li>
               🪓 Hatchet
@@ -404,34 +376,33 @@ return (
               </p>
             </li>
           )}
-
           {hasPickaxe && (
             <li>
               ⛏️ Pickaxe
               <p className="italic text-[10px] text-gray-300 mt-0.5">
-                – Just an old pickaxe... don’t get excited. It's not a "Diamond Pickaxe".... What do you think this is, Minecraft?!
+                – Just an old pickaxe... not a Diamond one... this ain't Minecraft!
               </p>
             </li>
           )}
-
           {!hasKey && !hasHatchet && !hasPickaxe && <li>(Empty)</li>}
         </ul>
       </div>
     )}
 
-    {/* Obstacle Dialog Popup */}
-    {obstacleDialog && (
-      <div className="absolute bottom-8 bg-gray-900 text-white border border-white px-4 py-2 rounded shadow z-50">
+        {/* Dialog Popups */}
+        {obstacleDialog && (
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white border border-white px-4 py-2 rounded shadow z-50">
         {obstacleDialog}
       </div>
     )}
 
-    {/* System Dialog Popup */}
     {systemDialog && (
-      <div className="absolute bottom-20 bg-gray-900 text-white border border-blue-400 px-4 py-2 rounded shadow z-50">
+      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white border border-blue-400 px-4 py-2 rounded shadow z-50">
         {systemDialog}
       </div>
     )}
-  </div>  
-);
-}
+  </div> // ✅ closes the full return's wrapper
+);         // ✅ closes the return statement
+
+} // ✅ closes the function
+

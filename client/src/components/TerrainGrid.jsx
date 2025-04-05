@@ -44,12 +44,14 @@ export default function TerrainGrid({
     <div
       className="grid gap-[1px] border border-white"
       style={{
-        gridTemplateColumns: `repeat(20, minmax(0, 1fr))`,
-        gridAutoRows: '1fr',
-        width: '1600px',
-        height: '1600px',
+        gridTemplateColumns: `repeat(20, 5vw)`, // each tile 5% of viewport width
+        gridAutoRows: '5vw',                   // same for height to keep it square
         display: 'grid',
+        maxWidth: '100vw',
+        maxHeight: '100vh',
+        margin: '0 auto',
       }}
+      
     >
       {grid.map((row, y) =>
   row.map((cell, x) => {
