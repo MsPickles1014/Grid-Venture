@@ -19,7 +19,7 @@ const [deadEndTriggered, setDeadEndTriggered] = useState(false);
 const [hasPickaxe, setHasPickaxe] = useState(false);
 const [exploredTiles, setExploredTiles] = useState(new Set());
 const [inventoryOpen, setInventoryOpen] = useState(false);
-const [obstacleDialog, setObstacleDialog] = useState('');
+const [obstacleDialog, ] = useState('');
 const [systemDialog, setSystemDialog] = useState('');
 const [explorerPoints, setExplorerPoints] = useState(0);
 const [storeOpen, setStoreOpen] = useState(false);
@@ -29,14 +29,23 @@ const [dialogImage, setDialogImage] = useState('');
 const [dialogMessages, setDialogMessages] = useState([]);
 const [dialogIndex, setDialogIndex] = useState(0);
 const [npcDialogStage, setNpcDialogStage] = useState(0);
-const [activeDialogType, setActiveDialogType] = useState(null); // e.g., 'npc_joker'
+const [activeDialogType, setActiveDialogType] = useState(null); 
+const [gameWon, setGameWon] = useState(false);
+const [gameOver, setGameOver] = useState(false);
+
+
 const hudImages = {
   npcJester: '/assets/characters/the-Jester\'s-HUD-face.png',
   log: '/assets/objects/log_face.png',
   key: '/assets/objects/Key-HUD.png',
   chestLocked: '/assets/objects/locked_chest_oil.png', 
   chestUnlocked: '/assets/objects/unlocked_chest_oil.png',
-
+  hatchet: '/assets/objects/hatchet.png',
+  splinterLog: '/assets/objects/splinter_log.png',
+  rockslide: '/assets/tiles/rockslide_oil.png',
+  pickaxe: '/assets/objects/old_pickaxe.png',
+  clearedRockslide: '/assets/tiles/cleared_rockslide.png',
+  
 };
 
 
@@ -228,104 +237,167 @@ const handleInteraction = () => {
     return;
   }
   
-  
-
   // ✅ Chop the log with hatchet
-  else if (isNextTo(4, 4) && hasHatchet) {
+  else if (isNextTo(4, 4) && hasHatchet && !dialogActive) {
     updateTile(4, 4, 'path');
     setPlayerPos((prev) => ({ ...prev }));
-    setSystemDialog("You chopped the log and cleared the way!");
-setTimeout(() => setSystemDialog(''), 3000);
-
+  
+    setDialogImage(hudImages.splinterLog);
+    setDialogMessages([
+      "You raise your hatchet and swing with everything you’ve got...",
+      "*THWACK!* Splinters fly everywhere.",
+      "The log is no match for you. The path is now clear."
+    ]);
+    setDialogIndex(0);
+    setDialogActive(true);
+    setActiveDialogType('log_cleared');
+    return;
   }
-
+  
   // Pick up the pickaxe
-  else if (playerPos.x === 18 && playerPos.y === 7 && !hasPickaxe) {
+  else if (playerPos.x === 18 && playerPos.y === 7 && !hasPickaxe && !dialogActive) {
     setHasPickaxe(true);
     updateTile(18, 7, 'cave');
-    setSystemDialog("You picked up a pickaxe!");
-    setTimeout(() => setSystemDialog(''), 3000);
+  
+    setDialogImage(hudImages.pickaxe);
+    setDialogMessages([
+      "You pick up an old pickaxe...",
+      "It’s seen better days, but it might be just what you need to clear a path."
+    ]);
+    setDialogIndex(0);
+    setDialogActive(true);
+    setActiveDialogType('pickaxe');
+    return;
   }
-
-  // 🚫 Interact with the rockslide BEFORE having the pickaxe
-  else if (isNextTo(11, 9) && !hasPickaxe) {
-    setObstacleDialog("It appears that a rockslide recently occurred and now a giant boulder blocks the path, You'll need something sturdy to clear the way.");
-    setTimeout(() => setObstacleDialog(''), 4000);
-  }
-
-  // ✅ Clear the rockslide with pickaxe
-  else if (isNextTo(11, 9) && hasPickaxe) {
-    updateTile(11, 9, 'path');
-    setPlayerPos((prev) => ({ ...prev }));
-    setSystemDialog("You cleared the giant boulder with your pickaxe!");
-    setTimeout(() => setSystemDialog(''), 3000);
-  }
-};
-
-
-  // Handle keyboard inputs
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      const key = e.key.toLowerCase();
-  
-      switch (key) {
-        case 'w':
-          if (!dialogActive) movePlayer(0, -1, npcPos);
-          break;
-  
-        case 'a':
-          if (!dialogActive) movePlayer(-1, 0, npcPos);
-          break;
-  
-        case 's':
-          if (!dialogActive) movePlayer(0, 1, npcPos);
-          break;
-  
-        case 'd':
-          if (!dialogActive) movePlayer(1, 0, npcPos);
-          break;
-  
-          case 'e':
-            if (dialogActive) {
-              if (dialogIndex < dialogMessages.length - 1) {
-                // Advance to next line of current dialog
-                setDialogIndex((prev) => prev + 1);
-              } else {
-                // End of dialog
-                setDialogActive(false);
-                setDialogImage('');
-                setDialogMessages([]);
-                setDialogIndex(0);
-                setActiveDialogType(null);
-              }
-            } else {
-              // No dialog open — attempt interaction
-              handleInteraction();
-            }
-            break;
-      }
-    };
-  
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [npcPos, playerPos, dialogActive, dialogIndex, dialogMessages]);
   
 
-  // Tile trigger for the DEAD END message
+// ✅ Interact with rockslide WITH pickaxe
+else if (isNextTo(11, 9) && hasPickaxe && !dialogActive) {
+  updateTile(11, 9, 'path');
+  setPlayerPos((prev) => ({ ...prev }));
+
+  setDialogImage(hudImages.rockslide);
+  setDialogMessages([
+    "You grip your pickaxe and take a deep breath...",
+    "*CRACK!* You strike the weak spot with precision.",
+    "The boulders tumble away—path cleared!"
+  ]);
+  setDialogIndex(0);
+  setDialogActive(true);
+  setActiveDialogType('rockslide_cleared');
+  return;
+}
+
+// 🚫 Interact with rockslide BEFORE having pickaxe
+else if (isNextTo(11, 9) && !hasPickaxe && !dialogActive) {
+  setDialogImage(hudImages.rockslide);
+  setDialogMessages([
+    "The path ahead is completely blocked...",
+    "Looks like a landslide took out the trail.",
+    "You’ll need something strong to break through..."
+  ]);
+  setDialogIndex(0);
+  setDialogActive(true);
+  setActiveDialogType('rockslide_blocked');
+  return;
+}};
+
+
 useEffect(() => {
+  const handleKeyDown = (e) => {
+    const key = e.key.toLowerCase();
+
+    // 🧠 Prevent input if game is over or won
+    if (gameOver || gameWon) return;
+
+    switch (key) {
+      case 'w':
+        if (!dialogActive) movePlayer(0, -1, npcPos);
+        break;
+
+      case 'a':
+        if (!dialogActive) movePlayer(-1, 0, npcPos);
+        break;
+
+      case 's':
+        if (!dialogActive) movePlayer(0, 1, npcPos);
+        break;
+
+      case 'd':
+        if (!dialogActive) movePlayer(1, 0, npcPos);
+        break;
+
+      case 'e':
+        if (dialogActive) {
+          const nextIndex = dialogIndex + 1;
+
+          // 🪓 Chest opens → switch to hatchet image
+          if (activeDialogType === 'chest_unlocked' && nextIndex === 2) {
+            setDialogImage(hudImages.hatchet);
+          }
+
+          // 🪨 Rockslide clears → switch to cleared image
+          if (activeDialogType === 'rockslide_cleared' && nextIndex === 2) {
+            setDialogImage(hudImages.clearedRockslide);
+          }
+
+          if (dialogIndex < dialogMessages.length - 1) {
+            setDialogIndex(nextIndex);
+          } else {
+            setDialogActive(false);
+            setDialogImage('');
+            setDialogMessages([]);
+            setDialogIndex(0);
+            setActiveDialogType(null);
+          }
+        } else {
+          handleInteraction();
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  window.addEventListener('keydown', handleKeyDown);
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown);
+  };
+}, [
+  npcPos,
+  playerPos,
+  dialogActive,
+  dialogIndex,
+  dialogMessages,
+  activeDialogType,
+  gameOver,     
+  gameWon       
+]);
+
+
+useEffect(() => {
+  const isOnDeadEndTile = playerPos.x === 10 && playerPos.y === 16;
+
   if (
-    npcUnlocked &&                     
-    !deadEndTriggered && 
-    playerPos.x === 10 &&
-    playerPos.y === 16
+    npcUnlocked &&
+    isOnDeadEndTile &&
+    !deadEndTriggered &&
+    !dialogActive
   ) {
     setDeadEndTriggered(true);
-    setSystemDialog(".....I bet you're feeling pretty silly right about now, you have reached... a DEAD END!! hahaha!!");
-    setTimeout(() => setSystemDialog(''), 5000);
+    setDialogImage('/assets/characters/dead_end.png');
+    setDialogMessages([
+      ".....I bet you're feeling pretty silly right about now...",
+      "You have reached...",
+      "...a DEAD END!! hahaha!!"
+    ]);
+    setDialogIndex(0);
+    setDialogActive(true);
+    setActiveDialogType('dead_end');
   }
-}, [playerPos, npcUnlocked, deadEndTriggered]);
+}, [playerPos, npcUnlocked, deadEndTriggered, dialogActive]);
+
 
 const purchaseItem = (itemName, cost) => {
   if (explorerPoints >= cost) {
@@ -492,9 +564,4 @@ return (
   message={dialogMessages[dialogIndex]}
   isVisible={dialogActive}
 />
-
-  </div> // ✅ closes the full return's wrapper
-);         // ✅ closes the return statement
-
-} // ✅ closes the function
-
+</div> );} 
