@@ -11,7 +11,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173', // Dev client
+    'https://main.dsqz7c4wzmthj.amplifyapp.com/', // :triangular_flag_on_post: Replace with your real Amplify frontend URL
+  ],
+  credentials: true,
+}));
 app.use(express.json());
 
 // Routes
