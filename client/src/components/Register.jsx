@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 export default function Register({ onAuthSuccess }) {
+  const API = import.meta.env.VITE_API_URL;
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
 
@@ -13,7 +14,8 @@ export default function Register({ onAuthSuccess }) {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', form);
+    //   const res = await axios.post('http://localhost:5000/api/auth/register', form);
+    const res = await axios.post(`${API}/api/auth/register`, form);
       localStorage.setItem('token', res.data.token);
       onAuthSuccess(res.data.user);
     } catch (err) {
