@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import TerrainGrid from '../components/TerrainGrid';
 import predefinedGrid from '../data/predefinedGrid';
 import DialogBox from '../components/DialogBox';
+import hudImages from '../assets/index';
+import images from '../assets'; // 👈 Update this path if needed
+
 
 // Main Game Component
 export default function Game() {
@@ -32,21 +35,7 @@ const [npcDialogStage, setNpcDialogStage] = useState(0);
 const [activeDialogType, setActiveDialogType] = useState(null); 
 const [gameWon, setGameWon] = useState(false);
 const [gameOver, setGameOver] = useState(false);
-
-
-const hudImages = {
-  npcJester: '/assets/characters/the-Jester\'s-HUD-face.png',
-  log: '/assets/objects/log_face.png',
-  key: '/assets/objects/Key-HUD.png',
-  chestLocked: '/assets/objects/locked_chest_oil.png', 
-  chestUnlocked: '/assets/objects/unlocked_chest_oil.png',
-  hatchet: '/assets/objects/hatchet.png',
-  splinterLog: '/assets/objects/splinter_log.png',
-  rockslide: '/assets/tiles/rockslide_oil.png',
-  pickaxe: '/assets/objects/old_pickaxe.png',
-  clearedRockslide: '/assets/tiles/cleared_rockslide.png',
-  
-};
+const [showVictoryPopup, setShowVictoryPopup] = useState(false);
 
 
   // Prevent out-of-bounds movement
@@ -376,6 +365,7 @@ useEffect(() => {
 ]);
 
 
+// 🧟‍♂️ Dead End Dialog
 useEffect(() => {
   const isOnDeadEndTile = playerPos.x === 10 && playerPos.y === 16;
 
@@ -397,6 +387,31 @@ useEffect(() => {
     setActiveDialogType('dead_end');
   }
 }, [playerPos, npcUnlocked, deadEndTriggered, dialogActive]);
+
+
+// 🎉 Victory Dialog
+useEffect(() => {
+  const isVictoryTile = playerPos.x === 13 && playerPos.y === 19;
+
+  if (isVictoryTile && !gameWon && !dialogActive) {
+    setGameWon(true);
+    setDialogImage(images.victory); // ✅ Use the imported image
+    setDialogMessages([
+      "🎉 Congratulations!",
+      "You've completed Grid-Venture!",
+      "Thanks for playing, explorer."
+    ]);
+    setDialogIndex(0);
+    setDialogActive(true);
+    setActiveDialogType('victory');
+    setTimeout(() => {
+      setShowVictoryPopup(true);
+    }, 1000); // 👈 Give it a delay so dialog finishes first
+    
+  }
+}, [playerPos, gameWon, dialogActive]);
+
+
 
 
 const purchaseItem = (itemName, cost) => {
@@ -424,6 +439,12 @@ const handleReset = () => {
   setExploredTiles(new Set()); // CLEAR explored tiles
   setStoreOpen(false);
 setPurchasedItems([]);
+setGameWon(false);
+setDialogActive(false);
+setDialogMessages([]);
+setDialogIndex(0);
+setActiveDialogType(null);
+setShowVictoryPopup(false);
 
 };
 
@@ -563,5 +584,33 @@ return (
   image={dialogImage}
   message={dialogMessages[dialogIndex]}
   isVisible={dialogActive}
+
 />
+{showVictoryPopup && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
+    <div className="bg-yellow-50 text-black p-8 rounded-xl shadow-xl max-w-lg text-center border-4 border-yellow-600">
+      <h2 className="text-2xl font-bold mb-4">Thank You for Playing!</h2>
+      <p className="mb-6 text-sm">
+        Thank you for playing <strong>Noela's and Ian's Grid-Venture</strong>!<br />
+        We're both incredibly proud of the work that’s gone into this, and we’re not done yet!<br /><br />
+        In the meantime... would you care to play again?
+      </p>
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded shadow"
+        >
+          Yes, let's go again!
+        </button>
+        <button
+          onClick={() => setShowVictoryPopup(false)}
+          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow"
+        >
+          Maybe later!
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 </div> );} 
