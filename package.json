@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-      "start": "concurrently \"npm run start --prefix client\" \"npm run start --prefix server\"",
+    "start": "concurrently \"npm run start --prefix client\" \"npm run start --prefix server\"",
     "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
     "start:dev": "concurrently \"cd server && npm run watch\" \"wait-on tcp:3001 && cd client && npm run dev\"",
     "server": "cd server && npm start",
