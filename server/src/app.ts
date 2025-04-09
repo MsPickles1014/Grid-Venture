@@ -21,7 +21,29 @@ app.use(express.static('../client/dist'));
 //   credentials: true,
 // }));
 app.use(express.json());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl requests)
+      if (!origin) return callback(null, true);
 
+      if (origin.includes("localhost")) return callback(null, true);
+
+      if (origin.includes("vercel.app")) return callback(null, true);
+
+      if (origin.includes("onrender.com")) return callback(null, true);
+
+
+      // Otherwise, deny the request
+      
+      callback(new Error("Not allowed by CORS"));
+    },
+
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 // Routes
 
 app.use('/api/auth', authRouter);
