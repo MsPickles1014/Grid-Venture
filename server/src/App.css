@@ -1,0 +1,19 @@
+/* App.css - Minimal reset for your game */
+#root {
+  max-width: 100vw;
+  margin: 0 auto;
+  padding: 0;
+  background-color: #1a1a1a; /* Optional: dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Center the game vertically */
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
