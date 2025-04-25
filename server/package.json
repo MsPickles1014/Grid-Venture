@@ -4,7 +4,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "ts-node src/app.ts",
-    "build": "tsc",
+    "build": "echo 'No build step needed for JSX server'",
     "start": "node dist/app.js",
     "watch": "nodemon dist/app.js"
   },
