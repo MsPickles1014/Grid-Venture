@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "ts-node src/app.ts",
-    "build": "echo 'No build step needed for JSX server'",
+    
     "start": "node dist/app.js",
+"build": "tsc",
+  "dev": "nodemon src/app.jsx",
     "watch": "nodemon dist/app.js"
   },
   "keywords": [],
