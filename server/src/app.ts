@@ -22,6 +22,8 @@ app.use(
       if (origin.includes("localhost")) return callback(null, true);
 
       if (origin.includes("vercel.app")) return callback(null, true);
+      if (origin.includes("amplifyapp.com")) return callback(null, true);
+
 
       if (origin.includes("onrender.com")) return callback(null, true);
 
